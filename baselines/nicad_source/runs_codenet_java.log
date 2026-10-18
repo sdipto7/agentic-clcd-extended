@@ -1,0 +1,54 @@
+
+NiCad Cross-Clone Detector v7.0 (4.4.24)
+
+config=./lib/nicad/config/default-report.cfg
+system1=/home/sxa510/research/code/agentic-clcd/baselines/nicad_source/prepared/codenet/codenet_direct_java
+system2=/home/sxa510/research/code/agentic-clcd/baselines/nicad_source/prepared/codenet/codenet_direct_python
+threshold=0.30
+granularity=functions
+language=java
+transform=none
+rename=blind
+filter=none
+abstract=none
+normalize=none
+cluster=yes
+report=yes
+include=
+exclude=
+
+Tue Sep  8 10:29:35 PM CST 2026
+
+Extracting functions from java files in nicadclones/codenet_direct_java/codenet_direct_java
+
+real	0m10.879s
+user	0m4.797s
+sys	0m6.481s
+
+Extracted 694 functions
+
+Tue Sep  8 10:29:46 PM CST 2026
+
+Extracting functions from java files in nicadclones/codenet_direct_java/codenet_direct_python
+
+real	0m0.012s
+user	0m0.006s
+sys	0m0.015s
+
+Extracted 0 functions
+
+Applying blind renaming to extracted functions from java files in nicadclones/codenet_direct_java/codenet_direct_java
+
+real	0m0.380s
+user	0m0.332s
+sys	0m0.046s
+
+Applying blind renaming to extracted functions from java files in nicadclones/codenet_direct_java/codenet_direct_python
+
+real	0m0.001s
+user	0m0.001s
+sys	0m0.000s
+
+*** ERROR: Renaming failed, code 99
+Detailed log in nicadclones/codenet_direct_java/codenet_direct_python_functions-crossclones-2026-09-08-22:29:46.log
+

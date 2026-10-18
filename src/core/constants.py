@@ -21,16 +21,22 @@ PIPELINE_AGENTIC: str = "agentic"
 
 DATASET_XLCOST: str = "xlcost"
 DATASET_CODENET: str = "codenet"
+DATASET_GPTCLONEBENCH: str = "gptclonebench"
+DATASET_CLCDSA: str = "clcdsa"
 
 RAW_JAVA_XL_PATH: str = os.path.join(PROJECT_ROOT, "raw_data", "java_xl.json")
 RAW_JAVA_CN_PATH: str = os.path.join(PROJECT_ROOT, "raw_data", "java_cn.json")
 
-DATA_JAVA_PYTHON_XL_PATH: str = os.path.join(PROJECT_ROOT, "data", "java_python_xl.json")
-DATA_JAVA_PYTHON_CN_PATH: str = os.path.join(PROJECT_ROOT, "data", "java_python_cn.json")
+DATA_XLCOST_PATH: str = os.path.join(PROJECT_ROOT, "data", "xlcost.json")
+DATA_CODENET_PATH: str = os.path.join(PROJECT_ROOT, "data", "codenet.json")
+DATA_GPTCLONEBENCH_PATH: str = os.path.join(PROJECT_ROOT, "data", "gptclonebench.json")
+DATA_CLCDSA_PATH: str = os.path.join(PROJECT_ROOT, "data", "clcdsa.json")
 
 DATASET_FILE_MAP: dict[str, str] = {
-    DATASET_XLCOST: DATA_JAVA_PYTHON_XL_PATH,
-    DATASET_CODENET: DATA_JAVA_PYTHON_CN_PATH,
+    DATASET_XLCOST: DATA_XLCOST_PATH,
+    DATASET_CODENET: DATA_CODENET_PATH,
+    DATASET_GPTCLONEBENCH: DATA_GPTCLONEBENCH_PATH,
+    DATASET_CLCDSA: DATA_CLCDSA_PATH,
 }
 
 MODEL_MAP: dict[str, str] = {
@@ -60,6 +66,10 @@ API_RETRY_BACKOFF_SECONDS: float = 3.0
 
 PYTHON_LANGUAGE_IDENTIFIER: str = "Python"
 
+CPP_LANGUAGE_IDENTIFIER: str = "C++"
+
+CSHARP_LANGUAGE_IDENTIFIER: str = "C#"
+
 JAVA_LANGUAGE_IDENTIFIER: str = "Java"
 
 AGENT_MAX_ITERATIONS: int = 10
@@ -68,7 +78,12 @@ SKILL_CACHE_REFRESH_INTERVAL_COUNTER: int = 10
 
 PIPELINE_CHOICES: list[str] = [PIPELINE_DIRECT, PIPELINE_ALGO_BASED, PIPELINE_AGENTIC]
 MODEL_CHOICES: list[str] = list(MODEL_MAP.keys())
-DATASET_CHOICES: list[str] = [DATASET_XLCOST, DATASET_CODENET]
+DATASET_CHOICES: list[str] = [
+    DATASET_XLCOST,
+    DATASET_CODENET,
+    DATASET_GPTCLONEBENCH,
+    DATASET_CLCDSA,
+]
 
 RESULTS_CSV_PREFIX: str = "results"
 

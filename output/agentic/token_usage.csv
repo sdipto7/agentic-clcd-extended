@@ -1,0 +1,13 @@
+pipeline,model,dataset,pairs,elapsed_seconds,run_status,successful_requests,prompt_tokens,completion_tokens,total_tokens
+agentic,deepseek-v3.2,xlcost,3600,58208.91,estimated,14400,9797331,1254456,11051787
+agentic,deepseek-v3.2,codenet,1800,29104.46,estimated,7200,4898665,627229,5525894
+agentic,deepseek-v3.2,gptclonebench,2400,38805.94,estimated,9600,6531554,836304,7367858
+agentic,llama-3.3-nemotron,xlcost,3600,13020.84,estimated,14400,6297715,2230696,8528411
+agentic,llama-3.3-nemotron,codenet,1800,6510.42,estimated,7200,3148857,1115348,4264205
+agentic,llama-3.3-nemotron,gptclonebench,2400,8680.56,estimated,9600,4198476,1487131,5685607
+agentic,claude-3-haiku,xlcost,3600,22656.58,estimated,14400,4641320,1096924,5738244
+agentic,claude-3-haiku,codenet,1800,11328.29,estimated,7200,2320660,548462,2869122
+agentic,claude-3-haiku,gptclonebench,2400,15104.39,estimated,9600,3094213,731283,3825496
+agentic,gpt-4o-mini,xlcost,3600,10198.9,estimated,14400,6222984,741616,6964600
+agentic,gpt-4o-mini,codenet,1800,5099.45,estimated,7200,3111492,370808,3482300
+agentic,gpt-4o-mini,gptclonebench,2400,6799.26,estimated,9600,4148656,494409,4643065

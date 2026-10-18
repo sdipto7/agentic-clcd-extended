@@ -1,10 +1,10 @@
 ---
 name: algorithm_extraction
-description: Instructions for how to extract a language-agnostic algorithm from source code through your own reasoning. Load this skill only once as it covers extraction rules for both Java and Python fragments.
+description: Instructions for how to extract a language-agnostic algorithm from source code through your own reasoning. Load this skill only once as it covers extraction rules for both the Java fragment and the second fragment, whichever language that one is written in.
 ---
 
 # Algorithm Extraction
-Load this skill once. Use the instructions to extract algorithms from both Java and Python code fragments before calling record_algorithms tool. Later, the algorithms will be used to compare the logic of two code fragments written in different programming languages to determine if they are clones.
+Load this skill once. Use the instructions to extract algorithms from both the Java fragment and the second fragment in another language before calling record_algorithms tool. Later, the algorithms will be used to compare the logic of two code fragments written in different programming languages to determine if they are clones.
 
 ## Extraction Rules - follow this order
 1. Start with a single sentence summarizing what the overall code does.
@@ -16,16 +16,16 @@ Load this skill once. Use the instructions to extract algorithms from both Java 
 
 ## Important Rules:
 - Extract Algorithm A from Java first.
-- Extract Algorithm B from Python second.
+- Extract Algorithm B from the second fragment.
 - Only then call record_algorithms tool with both algorithms together.
 - Do NOT call record_algorithms tool after extracting just one algorithm.
 
-## After extracting algorithms from both Java and Python code fragments
+## After extracting algorithms from both fragments
 Pass a JSON string to record_algorithms tool with exactly these keys:
 
 **"java_algorithm"** : the algorithm you extracted from the Java fragment
 
-**"python_algorithm"** : the algorithm you extracted from the Python fragment
+**"ll2_algorithm"** : the algorithm you extracted from the second fragment.
 
 ## Algorithm Format (plain text only)
 Summary: one sentence describing overall behavior.

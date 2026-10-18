@@ -13,17 +13,17 @@ BACKGROUND:
 Two code fragments are cross-language clones if they implement the same computational logic and produce the same output for the same input, regardless of the programming language, syntax, naming conventions, or library choices used.
 
 TASK:
-Determine whether the Java and Python code fragments below are clones.
+Determine whether the Java and {language_b} code fragments below are clones.
 
 REASONING APPROACH — follow this order:
-1. Analyze the Java and Python code fragments independently: identify their inputs, outputs, data structures, control flow, and how they handle edge cases and errors.
+1. Analyze the Java and {language_b} code fragments independently: identify their inputs, outputs, data structures, control flow, and how they handle edge cases and errors.
 2. Compare their behavior: check operation ordering, equivalent conditions, and matching handling of empty inputs, boundary values, and errors.
 3. Judge whether both code fragments implement the same overall logic and produce the same output for the same input.
 
 Java fragment:
 {codeA}
 
-Python fragment:
+{language_b} fragment:
 {codeB}
 
 OUTPUT RULES:
@@ -71,14 +71,14 @@ FUNCTION <name>
 ALGO_DETECTION_PROMPT: str = """You are an expert in program analysis and algorithm equivalence.
 
 BACKGROUND:
-You are given two pseudocode algorithms extracted from code fragments written in different programming languages - Algorithm A from Java and Algorithm B from Python. 
-Your task is to determine whether both algorithms implement the same computational logic, meaning they are cross-language code clones. 
+You are given two pseudocode algorithms extracted from code fragments written in different programming languages - Algorithm A from Java and Algorithm B from {language_b}.
+Your task is to determine whether both algorithms implement the same computational logic, meaning they are cross-language code clones.
 This comparison is purely at the logical level - language, syntax, and naming differences are already eliminated in the pseudocode.
 
 Algorithm A (extracted from Java):
 {algorithm_a}
 
-Algorithm B (extracted from Python):
+Algorithm B (extracted from {language_b}):
 {algorithm_b}
 
 REASONING APPROACH — follow this order:

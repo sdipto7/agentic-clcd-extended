@@ -25,6 +25,7 @@ from src.inference.agentic.tools import (
     get_recorded_algorithms,
 )
 from src.inference.llm_helper import pace_api_call
+from src.inference.llm_response_parser import extract_verdict_from_text
 from src.io.algorithm_writer import save_algorithm_pair
 
 logger = get_logger(__name__)
@@ -40,11 +41,12 @@ def _goal_message(rec: dict[str, Any]) -> str:
     Returns:
         Goal string passed to the agent executor.
     """
+    language_b = rec["ll2"]
     return (
-        f"Determine whether the following Java and Python code fragments "
+        f"Determine whether the following Java and {language_b} code fragments "
         f"are cross-language clones (pair ID: {rec['pair_id']}).\n\n"
         f"Java code:\n{rec['codeA']}\n\n"
-        f"Python code:\n{rec['codeB']}\n\n"
+        f"{language_b} code:\n{rec['codeB']}\n\n"
         f"Use your available skills and tools to reach a verdict, "
         f"then record your final result using write_result."
     )
@@ -73,12 +75,16 @@ def run_agentic_workflow(
             pair_id=record["pair_id"],
             dataset=record["dataset"],
             ground_truth=record["label"],
+            ll1=record["ll1"],
+            ll2=record["ll2"],
         )
 
         t0 = time.perf_counter()
 
+        agent_output_text = ""
         try:
-            executor.invoke({"input": _goal_message(record)})
+            result = executor.invoke({"input": _goal_message(record)})
+            agent_output_text = str(result.get("output", ""))
         except Exception as exc:
             logger.exception("Agent crashed for pair %s: %s", record["pair_id"], exc)
 
@@ -96,16 +102,37 @@ def run_agentic_workflow(
                 algorithms_by_pair={pair_id: algorithms_by_pair[pair_id]},
             )
 
-        if not was_write_result_called():
-            logger.warning(
-                "Agent did not call write_result for %s; recording ERROR.",
-                record["pair_id"],
-            )
+        if was_write_result_called():
+            final_verdict = get_last_predicted_label()
+        else:
+            # The agent gave a Final Answer without calling write_result (violates
+            # the system prompt's rule #3). Recover a verdict from that free-text
+            # answer rather than discarding the pair as ERROR. This is a fallback,
+            # not a tool-verified result: it was not produced through the
+            # structured write_result call, so it carries a weaker methodological
+            # guarantee than tool-verified verdicts.
+            final_verdict = extract_verdict_from_text(agent_output_text)
+            if final_verdict is not None:
+                logger.warning(
+                    "Agent did not call write_result for %s; recovered verdict %s "
+                    "from Final Answer text (untrusted fallback, not tool-verified).",
+                    record["pair_id"],
+                    final_verdict,
+                )
+            else:
+                final_verdict = ERROR
+                logger.warning(
+                    "Agent did not call write_result for %s and no verdict could be "
+                    "recovered from its Final Answer; recording ERROR.",
+                    record["pair_id"],
+                )
 
             writer.record_result(
                 pair_id=record["pair_id"],
+                ll1=record["ll1"],
+                ll2=record["ll2"],
                 ground_truth=record["label"],
-                predicted_label=ERROR,
+                predicted_label=final_verdict,
             )
 
         logger.info(
@@ -113,7 +140,7 @@ def run_agentic_workflow(
             record["pair_id"],
             PIPELINE_AGENTIC,
             LABEL_TO_VERDICT.get(record["label"], NOT_CLONE),
-            get_last_predicted_label() if was_write_result_called() else ERROR,
+            final_verdict,
             elapsed,
         )
 

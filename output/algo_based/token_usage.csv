@@ -1,0 +1,13 @@
+pipeline,model,dataset,pairs,elapsed_seconds,run_status,successful_requests,prompt_tokens,completion_tokens,total_tokens
+algo_based,deepseek-v3.2,xlcost,3600,82431.61,estimated,10800,4833339,2074028,6907367
+algo_based,deepseek-v3.2,codenet,1800,41215.81,estimated,5400,2416669,1037014,3453683
+algo_based,deepseek-v3.2,gptclonebench,2400,54954.41,estimated,7200,3222226,1382685,4604911
+algo_based,llama-3.3-nemotron,xlcost,3600,195613.58,estimated,10800,3458377,1871879,5330256
+algo_based,llama-3.3-nemotron,codenet,1800,97806.79,estimated,5400,1729189,935940,2665129
+algo_based,llama-3.3-nemotron,gptclonebench,2400,130409.05,estimated,7200,2305586,1247919,3553505
+algo_based,claude-3-haiku,xlcost,3600,17331.81,estimated,10800,2791230,795172,3586402
+algo_based,claude-3-haiku,codenet,1800,8665.91,estimated,5400,1395615,397586,1793201
+algo_based,claude-3-haiku,gptclonebench,2400,11554.54,estimated,7200,1860820,530115,2390935
+algo_based,gpt-4o-mini,xlcost,3600,119527.62,estimated,10800,3257837,1095038,4352875
+algo_based,gpt-4o-mini,codenet,1800,59763.81,estimated,5400,1628918,547519,2176437
+algo_based,gpt-4o-mini,gptclonebench,2400,79685.08,estimated,7200,2171891,730026,2901917

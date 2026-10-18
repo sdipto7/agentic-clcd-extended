@@ -1,0 +1,13 @@
+pipeline,model,dataset,pairs,elapsed_seconds,run_status,successful_requests,prompt_tokens,completion_tokens,total_tokens
+direct,deepseek-v3.2,xlcost,3600,14065.78,estimated,3600,4013775,591136,4604911
+direct,deepseek-v3.2,codenet,1800,7032.89,estimated,1800,2006887,295569,2302456
+direct,deepseek-v3.2,gptclonebench,2400,9377.19,estimated,2400,2675850,394091,3069941
+direct,llama-3.3-nemotron,xlcost,3600,43724.48,estimated,3600,2555638,997866,3553504
+direct,llama-3.3-nemotron,codenet,1800,21862.24,estimated,1800,1277819,498933,1776752
+direct,llama-3.3-nemotron,gptclonebench,2400,29149.65,estimated,2400,1703758,665245,2369003
+direct,claude-3-haiku,xlcost,3600,4743.91,estimated,3600,2161449,229486,2390935
+direct,claude-3-haiku,codenet,1800,2371.95,estimated,1800,1080724,114743,1195467
+direct,claude-3-haiku,gptclonebench,2400,3162.6,estimated,2400,1440966,152991,1593957
+direct,gpt-4o-mini,xlcost,3600,12294.72,estimated,3600,2649757,252160,2901917
+direct,gpt-4o-mini,codenet,1800,6147.36,estimated,1800,1324879,126079,1450958
+direct,gpt-4o-mini,gptclonebench,2400,8196.48,estimated,2400,1766505,168106,1934611

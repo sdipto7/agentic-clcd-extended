@@ -1,0 +1,34 @@
+POOLED CLONE-DETECTION PERFORMANCE ANALYSIS
+============================================================
+Generated:  2026-09-16 02:06:10
+Datasets:   xlcost, codenet, gptclonebench
+Languages:  C#
+Pipelines:  direct, algo_based, agentic
+Models:     claude-3-haiku, deepseek-v3.2, gpt-4o-mini, llama-3.3-nemotron
+
+Methodology: pooled metrics are computed by first summing raw
+TP/TN/FP/FN confusion counts across every run in the group, then
+deriving precision/recall/F1 once from those combined counts - not by
+averaging per-run metrics. This matches the pooling formulas in
+chap4_agentic_clcd.tex (TP_pooled = sum(TP_i), etc.). A prediction that
+is not CLONE or NOT_CLONE (e.g. ERROR) always counts as incorrect: a
+false negative if the pair is a true clone, a false positive otherwise.
+
+1. OVERALL POOLED PERFORMANCE (pooled across all models and datasets)
+========================================================================
+
+Pipeline    Total  Precision  Recall  F1     TP    TN    FP   FN  
+----------  -----  ---------  ------  -----  ----  ----  ---  ----
+direct      12000  96.4%      79.6%   87.2%  4778  5824  176  1222
+algo_based  12000  92.7%      88.7%   90.6%  5321  5581  419  679 
+agentic     12000  96.5%      95.3%   95.9%  5717  5793  207  283 
+
+2. MODEL-LEVEL POOLED F1-SCORE (pooled across selected datasets, per model)
+============================================================================
+
+Model               direct  algo_based  agentic
+------------------  ------  ----------  -------
+claude-3-haiku      91.1%   94.9%       98.5%  
+deepseek-v3.2       86.1%   92.7%       95.9%  
+gpt-4o-mini         78.0%   88.6%       96.2%  
+llama-3.3-nemotron  92.1%   86.3%       92.8%

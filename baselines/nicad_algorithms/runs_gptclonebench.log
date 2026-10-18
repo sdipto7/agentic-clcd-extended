@@ -1,0 +1,70 @@
+
+NiCad Clone Detector v7.0 (4.4.24)
+
+config=./lib/nicad/config/default-report.cfg
+system=/home/sxa510/research/code/agentic-clcd/baselines/nicad_algorithms/prepared/gptclonebench/gptclonebench_algorithms_py
+threshold=0.30
+granularity=functions
+language=py
+transform=none
+rename=blind
+filter=none
+abstract=none
+normalize=none
+cluster=yes
+report=yes
+include=
+exclude=
+
+Tue Sep  8 10:31:42 PM CST 2026
+
+Extracting functions from py files in nicadclones/gptclonebench_algorithms_py/gptclonebench_algorithms_py
+
+real	1m2.056s
+user	0m24.607s
+sys	0m39.218s
+
+Extracted 2400 functions
+
+Applying blind renaming to extracted functions from py files in nicadclones/gptclonebench_algorithms_py/gptclonebench_algorithms_py
+
+real	0m0.614s
+user	0m0.482s
+sys	0m0.122s
+
+Finding clones between 10 and 2500 lines at UPI threshold 0.30
+
+real	0m1.355s
+user	0m1.169s
+sys	0m0.176s
+
+Found 704195 clone pairs
+
+Clustering clone pairs into classes
+
+real	0m1.429s
+user	0m1.349s
+sys	0m0.078s
+
+Clustered clone pairs into 1 classes
+
+Getting original sources for clones
+
+real	0m0.019s
+user	0m0.011s
+sys	0m0.009s
+
+Making HTML reports
+
+real	0m0.062s
+user	0m0.056s
+sys	0m0.007s
+
+Done.
+
+Detailed log in nicadclones/gptclonebench_algorithms_py/gptclonebench_algorithms_py_functions-clones-2026-09-08-22:31:42.log
+Results in nicadclones/gptclonebench_algorithms_py/gptclonebench_algorithms_py_functions-blind-clones/
+Report in nicadclones/gptclonebench_algorithms_py/gptclonebench_algorithms_py_functions-blind-clones/gptclonebench_algorithms_py_functions-blind-clones-0.30-classes-withsource.html
+
+Tue Sep  8 10:32:47 PM CST 2026
+

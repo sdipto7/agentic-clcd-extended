@@ -1,13 +1,8 @@
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 *.pyc
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -26,12 +21,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
-# Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
-# Unit test / coverage reports
 htmlcov/
 .tox/
 .nox/
@@ -45,11 +36,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
-# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
-
-# Environments
 .idea
 .env
 .venv
@@ -58,10 +45,5 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-
-# ignoring big directories
-data/
 logs/
-output/
-raw_data/
-reports/
+baselines/*/prepared/

@@ -1,0 +1,4 @@
+comparison,shared_pairs,both_correct,a_correct_b_wrong,a_wrong_b_correct,both_wrong,p_value
+Direct vs Algorithm,31200,23942,1977,3934,1347,1.82478573507e-145
+Direct vs Agentic,31200,24741,1178,4801,480,0
+Algorithm vs Agentic,31200,26825,1051,2717,607,1.12985154901e-167

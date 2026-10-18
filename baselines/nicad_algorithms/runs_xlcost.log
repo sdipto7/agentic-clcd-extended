@@ -1,0 +1,62 @@
+
+NiCad Clone Detector v7.0 (4.4.24)
+
+config=./lib/nicad/config/default-report.cfg
+system=/home/sxa510/research/code/agentic-clcd/baselines/nicad_algorithms/prepared/xlcost/xlcost_algorithms_py
+threshold=0.30
+granularity=functions
+language=py
+transform=none
+rename=blind
+filter=none
+abstract=none
+normalize=none
+cluster=yes
+report=yes
+include=
+exclude=
+
+Tue Sep  8 10:30:18 PM CST 2026
+
+Using previously extracted functions from py files in nicadclones/xlcost_algorithms_py/xlcost_algorithms_py
+
+Extracted 2400 functions
+
+Using previously blind renamed extracted functions from py files in nicadclones/xlcost_algorithms_py/xlcost_algorithms_py
+
+Finding clones between 10 and 2500 lines at UPI threshold 0.30
+
+real	0m3.442s
+user	0m3.043s
+sys	0m0.333s
+
+Found 1544258 clone pairs
+
+Clustering clone pairs into classes
+
+real	0m3.818s
+user	0m3.669s
+sys	0m0.130s
+
+Clustered clone pairs into 1 classes
+
+Getting original sources for clones
+
+real	0m0.027s
+user	0m0.012s
+sys	0m0.015s
+
+Making HTML reports
+
+real	0m0.082s
+user	0m0.077s
+sys	0m0.005s
+
+Done.
+
+Detailed log in nicadclones/xlcost_algorithms_py/xlcost_algorithms_py_functions-clones-2026-09-08-22:30:18.log
+Results in nicadclones/xlcost_algorithms_py/xlcost_algorithms_py_functions-blind-clones/
+Report in nicadclones/xlcost_algorithms_py/xlcost_algorithms_py_functions-blind-clones/xlcost_algorithms_py_functions-blind-clones-0.30-classes-withsource.html
+
+Tue Sep  8 10:30:25 PM CST 2026
+

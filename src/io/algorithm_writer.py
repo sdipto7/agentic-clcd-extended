@@ -21,7 +21,7 @@ def save_algorithm_pair(
         pipeline: Current running pipeline
         model_alias: Model alias for the current run
         dataset_name: Dataset name for the current run
-        algorithms_by_pair: Pair_id -> {"java_algorithm": ..., "python_algorithm": ...}.
+        algorithms_by_pair: Pair_id -> {"java_algorithm": ..., "ll2_algorithm": ...}.
 
     Returns:
         None.
