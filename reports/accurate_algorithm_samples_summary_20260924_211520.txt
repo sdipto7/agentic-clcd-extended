@@ -1,0 +1,16 @@
+ACCURATE ALGORITHM SAMPLE SUMMARY
+============================================================
+JSON file: reports/accurate_algorithm_samples_20260924_211520.json
+Selected samples: 300
+Candidate pool after filtering: 29368
+Random seed: 20260924
+Score mean: 0.9817
+Score median: 1.0000
+Score min/max: 0.8286/1.0000
+
+By pipeline: algo_based=272, agentic=28
+By dataset: codenet=67, gptclonebench=84, xlcost=149
+By ll2: C#=110, C++=72, Python=118
+By model: claude-3-haiku=71, deepseek-v3.2=83, gpt-4o-mini=72, llama-3.3-nemotron=74
+
+This is an automated pre-screening for almost accurate algorithms. It checks structural/source-feature coverage and obvious extraction failures; it is not a formal semantic proof. Manual verification is still recommended before thesis claims.

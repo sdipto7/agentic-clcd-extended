@@ -1,0 +1,62 @@
+
+NiCad Clone Detector v7.0 (4.4.24)
+
+config=./lib/nicad/config/default-report.cfg
+system=/home/sxa510/research/code/agentic-clcd/baselines/nicad_algorithms/prepared/codenet/codenet_algorithms_py
+threshold=0.30
+granularity=functions
+language=py
+transform=none
+rename=blind
+filter=none
+abstract=none
+normalize=none
+cluster=yes
+report=yes
+include=
+exclude=
+
+Tue Sep  8 10:31:24 PM CST 2026
+
+Using previously extracted functions from py files in nicadclones/codenet_algorithms_py/codenet_algorithms_py
+
+Extracted 1200 functions
+
+Using previously blind renamed extracted functions from py files in nicadclones/codenet_algorithms_py/codenet_algorithms_py
+
+Finding clones between 10 and 2500 lines at UPI threshold 0.30
+
+real	0m0.600s
+user	0m0.489s
+sys	0m0.094s
+
+Found 327576 clone pairs
+
+Clustering clone pairs into classes
+
+real	0m0.590s
+user	0m0.536s
+sys	0m0.053s
+
+Clustered clone pairs into 1 classes
+
+Getting original sources for clones
+
+real	0m0.025s
+user	0m0.012s
+sys	0m0.009s
+
+Making HTML reports
+
+real	0m0.070s
+user	0m0.064s
+sys	0m0.006s
+
+Done.
+
+Detailed log in nicadclones/codenet_algorithms_py/codenet_algorithms_py_functions-clones-2026-09-08-22:31:24.log
+Results in nicadclones/codenet_algorithms_py/codenet_algorithms_py_functions-blind-clones/
+Report in nicadclones/codenet_algorithms_py/codenet_algorithms_py_functions-blind-clones/codenet_algorithms_py_functions-blind-clones-0.30-classes-withsource.html
+
+Tue Sep  8 10:31:25 PM CST 2026
+

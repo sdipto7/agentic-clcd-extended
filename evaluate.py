@@ -16,7 +16,7 @@ _PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from src.core.constants import CLONE, NOT_CLONE, PROJECT_ROOT  # noqa: E402
+from src.core.constants import CLONE, NOT_CLONE, PIPELINE_CHOICES, PROJECT_ROOT  # noqa: E402
 
 
 def _iter_csv_files(results_dir: str) -> List[str]:
@@ -41,6 +41,23 @@ def _iter_csv_files(results_dir: str) -> List[str]:
                 csv_files.append(os.path.join(dirpath, name))
 
     return sorted(csv_files)
+
+
+def _filter_llm_pipeline_files(paths: List[str]) -> List[str]:
+    """
+    Keep only result files that belong to an LLM pipeline (direct/algo_based/agentic).
+
+    This excludes baseline result files (nicad_source, nicad_algorithms, codebert,
+    clcdsa, etc.), which are evaluated separately via
+    ``evaluate_baselines.py`` so the two experiment families never share one report.
+
+    Args:
+        paths: Candidate result CSV paths (e.g., from ``_iter_csv_files``).
+
+    Returns:
+        The subset of paths whose inferred pipeline is in ``PIPELINE_CHOICES``.
+    """
+    return [p for p in paths if _extract_pipeline_model_dataset_from_path(p)[0] in PIPELINE_CHOICES]
 
 
 def _extract_pipeline_model_dataset_from_path(path: str) -> Tuple[str, str, str]:
@@ -221,21 +238,22 @@ def _evaluate_file(path: str) -> Dict[str, Any]:
     }
 
 
-def _get_report_csv_path(prefix: str = "evaluation_report") -> str:
+def _get_report_path(prefix: str, extension: str) -> str:
     """
-    Build a timestamped report CSV path under the reports directory.
+    Build a timestamped report file path under the reports directory.
 
     Args:
         prefix: Filename prefix to use before the timestamp.
+        extension: File extension without a leading dot (e.g. "csv", "txt").
 
     Returns:
-        Full path to a CSV file under PROJECT_ROOT/reports named like
-        prefix_YYYYMMDD_HHMMSS.csv.
+        Full path to a file under PROJECT_ROOT/reports named like
+        prefix_YYYYMMDD_HHMMSS.<extension>.
     """
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     reports_dir = os.path.join(PROJECT_ROOT, "reports")
 
-    return os.path.join(reports_dir, f"{prefix}_{stamp}.csv")
+    return os.path.join(reports_dir, f"{prefix}_{stamp}.{extension}")
 
 
 def _write_report_csv(path: str, rows: List[Dict[str, Any]]) -> None:
@@ -281,6 +299,320 @@ def _write_report_csv(path: str, rows: List[Dict[str, Any]]) -> None:
             writer.writerow({k: r[k] for k in fieldnames})
 
 
+def _load_rows_with_metadata(paths: List[str]) -> List[Dict[str, Any]]:
+    """
+    Read every row from every target file, tagged with its pipeline/model/dataset/ll2.
+
+    Each returned row keeps the original CSV fields (pair_id, ll1, ll2, ground_truth,
+    predicted_label) and adds ``_pipeline``, ``_model``, ``_dataset`` (inferred from
+    the file path) and ``_ll2`` (the row's own ``ll2`` value, or ``"UNKNOWN"`` for
+    older files that predate the ll1/ll2 columns), so all rows across every file can
+    be pooled and re-grouped along any of these dimensions in one pass.
+
+    Args:
+        paths: Result CSV file paths to load.
+
+    Returns:
+        A flat list of enriched row dicts, one per data row across all files.
+    """
+    all_rows: List[Dict[str, Any]] = []
+    for path in paths:
+        pipeline, model, dataset = _extract_pipeline_model_dataset_from_path(path)
+        with open(path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                enriched = dict(row)
+                enriched["_pipeline"] = pipeline
+                enriched["_model"] = model
+                enriched["_dataset"] = dataset
+                enriched["_ll2"] = str(row.get("ll2", "")).strip() or "UNKNOWN"
+                all_rows.append(enriched)
+
+    return all_rows
+
+
+def _pool_by(
+    rows: List[Dict[str, Any]], key_fn
+) -> Dict[Any, Dict[str, Any]]:
+    """
+    Group rows by a key function and compute pooled classification metrics per group.
+
+    Pooling means every group's metrics are derived from that group's *combined*
+    true_positive/true_negative/false_positive/false_negative counts, not from
+    averaging per-file accuracy/precision/recall/F1 values. This is the statistically
+    correct way to combine groups of unequal size (e.g., xlcost has 1200 pairs per
+    model, codenet has 600) and matches the pooling convention already used
+    elsewhere in this project's analysis.
+
+    Args:
+        rows: Enriched rows (see ``_load_rows_with_metadata``).
+        key_fn: Function mapping a row to its group key (e.g., a pipeline name,
+            or a ``(pipeline, ll2)`` tuple for a cross-tab).
+
+    Returns:
+        Mapping of group key to that group's metrics dict (see
+        ``_compute_classification_metrics``).
+    """
+    groups: Dict[Any, List[Dict[str, Any]]] = {}
+    for row in rows:
+        groups.setdefault(key_fn(row), []).append(row)
+
+    return {key: _compute_classification_metrics(group_rows) for key, group_rows in groups.items()}
+
+
+def _format_table(headers: List[str], data_rows: List[List[str]]) -> str:
+    """
+    Render a left-aligned, fixed-width monospace table as a single string.
+
+    Column widths are derived from the longest value (including the header) in
+    each column, with a 2-space gutter between columns.
+
+    Args:
+        headers: Column header labels.
+        data_rows: Table body rows; each inner list must have the same length
+            as ``headers``.
+
+    Returns:
+        The rendered table (header row, a divider line, then data rows),
+        newline-joined, with no trailing newline.
+    """
+    widths = [len(h) for h in headers]
+    for row in data_rows:
+        for i, cell in enumerate(row):
+            widths[i] = max(widths[i], len(str(cell)))
+
+    def _fmt_row(cells: List[str]) -> str:
+        return "  ".join(str(c).ljust(widths[i]) for i, c in enumerate(cells))
+
+    lines = [_fmt_row(headers), "  ".join("-" * w for w in widths)]
+    lines.extend(_fmt_row(row) for row in data_rows)
+
+    return "\n".join(lines)
+
+
+def _metrics_row(label_cols: List[str], metrics: Dict[str, Any]) -> List[str]:
+    """Build one table row: label column(s) followed by the standard metric columns."""
+    return [
+        *label_cols,
+        str(metrics["total"]),
+        metrics["accuracy"],
+        metrics["precision"],
+        metrics["recall"],
+        metrics["f1_score"],
+        str(metrics["true_positive"]),
+        str(metrics["true_negative"]),
+        str(metrics["false_positive"]),
+        str(metrics["false_negative"]),
+    ]
+
+
+_METRIC_HEADERS = ["Total", "Accuracy", "Precision", "Recall", "F1", "TP", "TN", "FP", "FN"]
+
+
+def _render_single_key_section(
+    title: str,
+    label_header: str,
+    grouped: Dict[str, Dict[str, Any]],
+) -> str:
+    """
+    Render one report section for a single-dimension grouping (e.g., by pipeline).
+
+    Rows are sorted by F1 descending, and a one-line best/worst summary is appended
+    (skipped when there is only one group, since a ranking is meaningless there).
+
+    Args:
+        title: Section heading text.
+        label_header: Header label for the group-key column.
+        grouped: Mapping of group key to its pooled metrics (see ``_pool_by``).
+
+    Returns:
+        The rendered section as a string.
+    """
+    ordered = sorted(grouped.items(), key=lambda kv: float(kv[1]["f1_score"]), reverse=True)
+    table = _format_table(
+        [label_header, *_METRIC_HEADERS],
+        [_metrics_row([key], metrics) for key, metrics in ordered],
+    )
+
+    lines = [title, "=" * len(title), "", table]
+    if len(ordered) > 1:
+        best_key, best_metrics = ordered[0]
+        worst_key, worst_metrics = ordered[-1]
+        lines.append("")
+        lines.append(
+            f"Highest F1: {best_key} (F1={best_metrics['f1_score']}, "
+            f"accuracy={best_metrics['accuracy']}) | "
+            f"Lowest F1: {worst_key} (F1={worst_metrics['f1_score']}, "
+            f"accuracy={worst_metrics['accuracy']})"
+        )
+
+    return "\n".join(lines)
+
+
+def _render_cross_tab_section(
+    title: str,
+    row_label_header: str,
+    col_label_header: str,
+    grouped: Dict[Tuple[str, str], Dict[str, Any]],
+) -> str:
+    """
+    Render one report section for a two-dimension grouping (e.g., pipeline x language).
+
+    Args:
+        title: Section heading text.
+        row_label_header: Header label for the first key element's column.
+        col_label_header: Header label for the second key element's column.
+        grouped: Mapping of (row_key, col_key) tuples to pooled metrics.
+
+    Returns:
+        The rendered section as a string, with sub-tables grouped by row_key
+        (each sorted by F1 descending within that row_key), so e.g. every
+        pipeline's per-language breakdown is shown together.
+    """
+    row_keys = sorted({k[0] for k in grouped})
+    lines = [title, "=" * len(title), ""]
+
+    for row_key in row_keys:
+        entries = sorted(
+            ((k[1], v) for k, v in grouped.items() if k[0] == row_key),
+            key=lambda kv: float(kv[1]["f1_score"]),
+            reverse=True,
+        )
+        table = _format_table(
+            [col_label_header, *_METRIC_HEADERS],
+            [_metrics_row([col_key], metrics) for col_key, metrics in entries],
+        )
+        lines.append(f"{row_label_header}: {row_key}")
+        lines.append(table)
+        lines.append("")
+
+    return "\n".join(lines).rstrip()
+
+
+def _write_analysis_txt(path: str, targets: List[str]) -> None:
+    """
+    Write the detailed, human-readable analysis report for the LLM pipeline runs.
+
+    Unlike the CSV report (one row per file, exactly as evaluated), this report
+    pools raw rows across files along several dimensions - pipeline, model,
+    dataset, and language (ll2) - both individually and cross-tabulated, so
+    questions like "was Python detection stronger than C++ overall" or "how does
+    claude-3-haiku compare across languages" can be read directly without manual
+    recomputation.
+
+    Args:
+        path: Output .txt file path to write (typically under the reports directory).
+        targets: Result CSV file paths that were included in this evaluation run.
+
+    Returns:
+        None.
+    """
+    rows = _load_rows_with_metadata(targets)
+
+    by_pipeline = _pool_by(rows, lambda r: r["_pipeline"])
+    by_model = _pool_by(rows, lambda r: r["_model"])
+    by_dataset = _pool_by(rows, lambda r: r["_dataset"])
+    by_language = _pool_by(rows, lambda r: r["_ll2"])
+    by_pipeline_language = _pool_by(rows, lambda r: (r["_pipeline"], r["_ll2"]))
+    by_model_language = _pool_by(rows, lambda r: (r["_model"], r["_ll2"]))
+    by_full = _pool_by(
+        rows, lambda r: (r["_pipeline"], r["_model"], r["_dataset"], r["_ll2"])
+    )
+
+    overall = _compute_classification_metrics(rows)
+    languages_present = sorted(by_language)
+
+    header = [
+        "LLM PIPELINE - DETAILED ANALYSIS REPORT",
+        "=" * 60,
+        f"Generated:       {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"Files analyzed:  {len(targets)}",
+        f"Total pairs:     {overall['total']}",
+        f"Pipelines:       {', '.join(sorted(by_pipeline))}",
+        f"Models:          {', '.join(sorted(by_model))}",
+        f"Datasets:        {', '.join(sorted(by_dataset))}",
+        f"Languages (ll2): {', '.join(languages_present)}",
+        "",
+        "Methodology: every metric below is computed by pooling raw",
+        "true_positive/true_negative/false_positive/false_negative counts across",
+        "all rows in the group, then deriving accuracy/precision/recall/F1 from",
+        "those pooled counts - not by averaging per-file metrics. A prediction of",
+        "ERROR (the model failed to produce a usable verdict) counts as incorrect:",
+        "a false negative if the pair is a true clone, a false positive otherwise.",
+        "Some datasets do not include every language (e.g., clcdsa is Python-only;",
+        "gptclonebench has Python and C# but no C++), so language totals reflect",
+        "only the datasets that actually contain that language. If any experiment",
+        "is still in progress, totals reflect whatever has completed so far.",
+        "",
+    ]
+
+    sections = [
+        _render_single_key_section(
+            "1. PIPELINE-LEVEL SUMMARY (pooled across all models, datasets, languages)",
+            "Pipeline",
+            by_pipeline,
+        ),
+        _render_single_key_section(
+            "2. MODEL-LEVEL SUMMARY (pooled across all pipelines, datasets, languages)",
+            "Model",
+            by_model,
+        ),
+        _render_single_key_section(
+            "3. DATASET-LEVEL SUMMARY (pooled across all pipelines, models, languages)",
+            "Dataset",
+            by_dataset,
+        ),
+        _render_single_key_section(
+            "4. LANGUAGE-LEVEL SUMMARY (pooled across all pipelines, models, datasets)",
+            "Language",
+            by_language,
+        ),
+        _render_cross_tab_section(
+            "5. PIPELINE x LANGUAGE BREAKDOWN (pooled across models and datasets)",
+            "Pipeline",
+            "Language",
+            by_pipeline_language,
+        ),
+        _render_cross_tab_section(
+            "6. MODEL x LANGUAGE BREAKDOWN (pooled across pipelines and datasets)",
+            "Model",
+            "Language",
+            by_model_language,
+        ),
+    ]
+
+    full_detail_rows = sorted(
+        by_full.items(), key=lambda kv: (kv[0][0], kv[0][1], kv[0][2], kv[0][3])
+    )
+    full_table = _format_table(
+        ["Pipeline", "Model", "Dataset", "Language", *_METRIC_HEADERS],
+        [_metrics_row(list(key), metrics) for key, metrics in full_detail_rows],
+    )
+    sections.append(
+        "7. FULL DETAIL (pipeline x model x dataset x language, no pooling beyond "
+        "this row)\n" + "=" * 76 + "\n\n" + full_table
+    )
+
+    sections.append(
+        "8. NOTES\n"
+        + "=" * 8
+        + "\n\n"
+        "- A group with 0 total pairs cannot occur here: every group above is\n"
+        "  derived only from rows that actually exist in the scanned result files.\n"
+        "- 'UNKNOWN' under Language would mean a result file predates the ll1/ll2\n"
+        "  columns; none of the currently scanned files are expected to hit this.\n"
+        "- This report is regenerated from scratch on every run of evaluate.py and\n"
+        "  always reflects the current contents of the output/ directory at that\n"
+        "  moment - rerun it any time after new experiment results land."
+    )
+
+    full_text = "\n".join(header) + "\n" + ("\n\n".join(sections)) + "\n"
+
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(full_text)
+
+
 def main() -> None:
     """CLI for scanning CSV outputs and writing reports."""
     parser = argparse.ArgumentParser(description="Evaluate experiment CSV outputs.")
@@ -301,21 +633,28 @@ def main() -> None:
     if args.file:
         targets = [args.file]
     else:
-        targets = _iter_csv_files(args.results_dir)
+        all_files = _iter_csv_files(args.results_dir)
+        targets = _filter_llm_pipeline_files(all_files)
+        skipped = len(all_files) - len(targets)
+        if skipped:
+            print(
+                f"Skipping {skipped} baseline result file(s); "
+                "use evaluate_baselines.py for the baseline report."
+            )
 
     if not targets:
         print(f"No CSV files found under {args.results_dir}")
         sys.exit(1)
 
-    reports: List[Dict[str, Any]] = []
-    for path in targets:
-        reports.append(_evaluate_file(path))
+    reports: List[Dict[str, Any]] = [_evaluate_file(path) for path in targets]
 
-    csv_path = _get_report_csv_path()
-
+    csv_path = _get_report_path("llm_evaluation_report", "csv")
     _write_report_csv(csv_path, reports)
+    print(f"LLM pipeline CSV report: {csv_path}")
 
-    print(f"Detailed CSV report: {csv_path}")
+    txt_path = _get_report_path("llm_detailed_analysis", "txt")
+    _write_analysis_txt(txt_path, targets)
+    print(f"LLM pipeline detailed analysis: {txt_path}")
 
 
 if __name__ == "__main__":

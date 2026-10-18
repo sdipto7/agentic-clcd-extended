@@ -1,6 +1,6 @@
 ---
 name: clone_detection_direct
-description: Instructions for how to detect cross-language clones by directly comparing raw Java and Python source code through your own reasoning. Best suited for short or logically simple code fragments where the intent is easy to read from the code itself.
+description: Instructions for how to detect cross-language clones by directly comparing raw Java source code against another language's source code through your own reasoning. Best suited for short or logically simple code fragments where the intent is easy to read from the code itself.
 ---
 
 # Direct Cross-Language Clone Detection
@@ -10,7 +10,7 @@ Use this skill when comparing raw source code fragments directly.
 Two code fragments are cross-language clones if they implement the same computational logic and produce the same output for the same input, regardless of programming language, syntax, naming conventions, or library choices used.
 
 ## Reasoning Approach - follow this order
-1. Analyze the Java and Python code fragments independently: identify their inputs, outputs, data structures, control flow, and how they handle edge cases and errors.
+1. Analyze the Java fragment and the other code fragment independently: identify their inputs, outputs, data structures, control flow, and how they handle edge cases and errors.
 2. Compare behavior: check operation ordering, equivalent conditions, and matching handling of empty inputs, boundary values, and errors.
 3. Judge whether both code fragments implement the same overall logic and produce the same output for the same input.
 

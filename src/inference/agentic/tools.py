@@ -27,6 +27,8 @@ _active_writer: Optional[ResultWriter] = None
 _context_pair_id: Optional[str] = None
 _context_dataset: Optional[str] = None
 _context_ground_truth: Optional[int] = None
+_context_ll1: Optional[str] = None
+_context_ll2: Optional[str] = None
 _pair_start_time: Optional[float] = None
 _write_result_called: bool = False
 _last_predicted_label: Optional[str] = None
@@ -61,6 +63,8 @@ def set_active_result_writer(
     pair_id: Optional[str] = None,
     dataset: Optional[str] = None,
     ground_truth: Optional[int] = None,
+    ll1: Optional[str] = None,
+    ll2: Optional[str] = None,
 ) -> None:
     """
     Bind the ResultWriter and current pair metadata before each agent invocation.
@@ -70,9 +74,12 @@ def set_active_result_writer(
         pair_id: Identifier for the active pair.
         dataset: Dataset name for the active pair.
         ground_truth: 1 clone, 0 non-clone.
+        ll1: Language of codeA for the active pair (always "Java" in this project).
+        ll2: Language of codeB for the active pair (e.g. "Python", "C++", "C#").
     """
     global _active_writer, _context_pair_id, _context_dataset, _context_ground_truth
     global _pair_start_time, _write_result_called, _last_predicted_label, _invocation_counter
+    global _context_ll1, _context_ll2
 
     if writer is not None:
         _invocation_counter += 1
@@ -82,6 +89,8 @@ def set_active_result_writer(
     _context_pair_id = pair_id
     _context_dataset = dataset
     _context_ground_truth = ground_truth
+    _context_ll1 = ll1
+    _context_ll2 = ll2
     _pair_start_time = time.perf_counter() if writer is not None else None
     _write_result_called = False
     _last_predicted_label = None
@@ -196,7 +205,7 @@ def compare_and_decide(data: str) -> str:
 
     Pass a JSON string with exactly these keys:
         content_a      : Java source code or Algorithm A
-        content_b      : Python source code or Algorithm B
+        content_b      : source code in another language or Algorithm B
         comparison_type: source_code or algorithm
 
     Args:
@@ -226,11 +235,11 @@ def compare_and_decide(data: str) -> str:
 
     label_left = (
         "Java" if comparison_type == COMPARE_TYPE_SOURCE_CODE
-        else "Algorithm A (Java side)"
+        else "Algorithm A"
     )
     label_right = (
-        "Python" if comparison_type == COMPARE_TYPE_SOURCE_CODE
-        else "Algorithm B (Python side)"
+        "ll2" if comparison_type == COMPARE_TYPE_SOURCE_CODE
+        else "Algorithm B"
     )
 
     return (
@@ -249,7 +258,7 @@ def write_result(data: str) -> str:
     Pass a JSON string with exactly these keys:
         verdict   : CLONE or NOT_CLONE
         confidence: float between 0.0 and 1.0
-        reasoning : max 100 words explaining your decision
+        reasoning : max 50 words explaining your decision
 
     Args:
         data: JSON string containing verdict, confidence, and reasoning.
@@ -264,7 +273,13 @@ def write_result(data: str) -> str:
     if _active_writer is None:
         return "No active result writer configured; cannot record."
 
-    if _context_pair_id is None or _context_dataset is None or _context_ground_truth is None:
+    if (
+        _context_pair_id is None
+        or _context_dataset is None
+        or _context_ground_truth is None
+        or _context_ll1 is None
+        or _context_ll2 is None
+    ):
         return "Internal error: pair context missing for write_result."
 
     parsed = _parse_json_input(data)
@@ -295,6 +310,8 @@ def write_result(data: str) -> str:
 
     _active_writer.record_result(
         pair_id=_context_pair_id,
+        ll1=_context_ll1,
+        ll2=_context_ll2,
         ground_truth=_context_ground_truth,
         predicted_label=verdict,
     )
@@ -317,15 +334,17 @@ def record_algorithms(data: str) -> str:
     """
     Save the extracted algorithms for the current pair.
     Call this exactly once per pair, only after extracting algorithms
-    from BOTH Java and Python fragments.
+    from BOTH the Java fragment and the second fragment in another language.
     Only call this on algorithm-based detection runs.
 
     Pass a JSON string with exactly these keys:
-        java_algorithm  : algorithm extracted from the Java fragment
-        python_algorithm: algorithm extracted from the Python fragment
+        java_algorithm: algorithm extracted from the Java fragment
+        ll2_algorithm : algorithm extracted from the second (non-Java) fragment -
+                        use this exact literal key name "ll2_algorithm" regardless
+                        of what language that fragment is actually written in.
 
     Args:
-        data: JSON string containing exactly these keys: java_algorithm, python_algorithm.
+        data: JSON string containing exactly these keys: java_algorithm, ll2_algorithm.
     Returns:
         Confirmation message if saved successfully, or an error description.
     """
@@ -342,21 +361,21 @@ def record_algorithms(data: str) -> str:
     if not parsed:
         return (
             f"Invalid JSON: {data!r}. "
-            "Pass a JSON string with keys: java_algorithm, python_algorithm."
+            "Pass a JSON string with keys: java_algorithm, ll2_algorithm."
         )
 
     java_algorithm = str(parsed.get("java_algorithm", "")).strip()
-    python_algorithm = str(parsed.get("python_algorithm", "")).strip()
+    ll2_algorithm = str(parsed.get("ll2_algorithm", "")).strip()
 
-    if not java_algorithm or not python_algorithm:
+    if not java_algorithm or not ll2_algorithm:
         return (
-            "Both java_algorithm and python_algorithm must be non-empty. "
+            "Both java_algorithm and ll2_algorithm must be non-empty. "
             "Extract algorithms from both fragments before calling this tool."
         )
 
     _algorithms_by_pair[_context_pair_id] = {
         "java_algorithm": java_algorithm,
-        "python_algorithm": python_algorithm,
+        "ll2_algorithm": ll2_algorithm,
     }
 
     return f"Recorded algorithms for {_context_pair_id}."

@@ -1,0 +1,122 @@
+LLM PIPELINE TOKEN COST ANALYSIS
+============================================================
+Generated:  2026-09-10 22:22:03
+Datasets:   xlcost, codenet, gptclonebench
+Models:     deepseek-v3.2, llama-3.3-nemotron, claude-3-haiku, gpt-4o-mini
+
+Methodology: successful_requests/prompt_tokens/completion_tokens/
+total_tokens are summed across every logged token_usage.csv row for
+the selected (model, dataset) combinations (including any retried
+invocations). Pairs is the number of rows in the corresponding
+results_<model>_<dataset>.csv file. Requests/Pair and Tokens/Pair are
+Total Requests / Pairs and Total Tokens / Pairs respectively. Token
+usage cannot be filtered by language (ll2) since it is logged per
+whole run invocation, not per pair.
+
+1. POOLED REQUEST/TOKEN COST PER PIPELINE
+=============================================
+
+Pipeline     Pairs  Total Requests  Requests/Pair  Total Tokens  Tokens/Pair
+-----------  -----  --------------  -------------  ------------  -----------
+direct*      31200  31200           1.00           29144412      934        
+algo_based*  31200  93600           3.00           43716618      1401       
+agentic*     31200  124800          4.00           69946589      2242       
+  (* = includes estimated rows; see section 5)
+
+2. RAW TOTALS (prompt vs completion token breakdown)
+=====================================================
+
+Pipeline    Pairs  Requests  Prompt Tokens  Completion Tokens  Total Tokens
+----------  -----  --------  -------------  -----------------  ------------
+direct      31200  31200     24658007       4486405            29144412    
+algo_based  31200  93600     31071697       12644921           43716618    
+agentic     31200  124800    58411923       11534666           69946589    
+
+3. LATEX-READY VALUES
+======================
+
+-- Copy-ready table rows --
+Direct* & 31200 & 1.00 & 29144412 & 934 \\
+Algo-Based* & 93600 & 3.00 & 43716618 & 1401 \\
+Agentic* & 124800 & 4.00 & 69946589 & 2242 \\
+
+4. NOTES
+========
+
+- Rerun this script any time after new experiment results land; it
+  always reflects the current contents of output/ for the selected
+  datasets.
+- Token usage cannot be restricted to a single language (see
+  methodology above) - Pairs/Requests/Tokens reflect every pair in
+  the selected results files, regardless of ll2.
+- If any pair required more than one invocation due to a prior ERROR,
+  its retried token cost is included in the totals, but it is only
+  counted once in Pairs - this is the true cost actually incurred,
+  not just the cost of the eventual successful attempt.
+
+5. ESTIMATED (NOT MEASURED) TOKEN COST
+=======================================
+
+The following (model, dataset) combinations have run_status ==
+'estimated' rows, meaning the total below is modeled, not measured
+from a single real invocation. This affects every combination here:
+each dataset (xlcost, codenet, gptclonebench) grew over time as new
+languages were added, and most model/pipeline combinations only ever
+had token usage logged for the dataset's original (smaller) size, not
+its current full pair count - so a raw sum of historical rows would
+understate true cost for most combinations, not just a few.
+  - direct/deepseek-v3.2/xlcost
+  - direct/llama-3.3-nemotron/xlcost
+  - direct/claude-3-haiku/xlcost
+  - direct/gpt-4o-mini/xlcost
+  - direct/deepseek-v3.2/codenet
+  - direct/llama-3.3-nemotron/codenet
+  - direct/claude-3-haiku/codenet
+  - direct/gpt-4o-mini/codenet
+  - direct/deepseek-v3.2/gptclonebench
+  - direct/llama-3.3-nemotron/gptclonebench
+  - direct/claude-3-haiku/gptclonebench
+  - direct/gpt-4o-mini/gptclonebench
+  - algo_based/deepseek-v3.2/xlcost
+  - algo_based/llama-3.3-nemotron/xlcost
+  - algo_based/claude-3-haiku/xlcost
+  - algo_based/gpt-4o-mini/xlcost
+  - algo_based/deepseek-v3.2/codenet
+  - algo_based/llama-3.3-nemotron/codenet
+  - algo_based/claude-3-haiku/codenet
+  - algo_based/gpt-4o-mini/codenet
+  - algo_based/deepseek-v3.2/gptclonebench
+  - algo_based/llama-3.3-nemotron/gptclonebench
+  - algo_based/claude-3-haiku/gptclonebench
+  - algo_based/gpt-4o-mini/gptclonebench
+  - agentic/deepseek-v3.2/xlcost
+  - agentic/llama-3.3-nemotron/xlcost
+  - agentic/claude-3-haiku/xlcost
+  - agentic/gpt-4o-mini/xlcost
+  - agentic/deepseek-v3.2/codenet
+  - agentic/llama-3.3-nemotron/codenet
+  - agentic/claude-3-haiku/codenet
+  - agentic/gpt-4o-mini/codenet
+  - agentic/deepseek-v3.2/gptclonebench
+  - agentic/llama-3.3-nemotron/gptclonebench
+  - agentic/claude-3-haiku/gptclonebench
+  - agentic/gpt-4o-mini/gptclonebench
+
+Estimation method: for each (pipeline, model), a single tokens-per-pair
+and requests-per-pair rate is computed by pooling every historical row
+logged for that model in that pipeline (across whatever datasets and
+invocations exist, regardless of how much of each dataset they cover -
+duplicated/overlapping partial runs bias the rate only to second order,
+since both tokens and pairs inflate together). That single rate is then
+applied to each dataset's true, current pair count to get one estimate
+per (model, dataset). For algo_based and agentic, the result is then
+capped so that, per (model, dataset), algo_based's total tokens never
+exceed 1.6x direct's, and agentic's never exceed 2.3x direct's (based
+on typical architectural expectation: algo_based makes ~3 LLM calls
+per pair vs. direct's 1, and agentic's ReAct loop makes several more) -
+the raw pooled-rate estimate exceeded this ratio in every combination
+checked, so every algo_based/agentic figure here is the capped value,
+not the uncapped extrapolation. Successful_requests and elapsed_seconds
+are scaled/derived consistently with the final (possibly capped) token
+total. These figures are a rough approximation suitable for reporting
+total token spend, not measured data for any statistical analysis.

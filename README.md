@@ -56,7 +56,7 @@ The LLM client is implemented in `src/inference/llm.py` and uses OpenRouter’s 
 python prepare_dataset.py
 ```
 
-This generates normalized datasets under `data/` (for example: `data/java_python_xl.json` and `data/java_python_cn.json`). Pipelines will error if these files do not exist.
+This generates normalized datasets under `data/` (for example: `data/xlcost.json` and `data/codenet.json`). Pipelines will error if these files do not exist.
 
 ---
 

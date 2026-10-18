@@ -1,0 +1,44 @@
+Total agentic evaluations loaded: 31200
+Route counts: {'direct': 18995, 'algo': 12205}
+
+=== TYPE x ROUTE (full population, 31,200 evaluations) ===
+Type                               Direct     Algo    Total  %Direct    %Algo
+Array/List processing                8274     5790    14064    58.8%    41.2%
+Other/mixed logic                    2683     1513     4196    63.9%    36.1%
+Nested/loop-heavy iteration          2467     1469     3936    62.7%    37.3%
+String processing                    1737     1207     2944    59.0%    41.0%
+Short, low-control-flow logic        1377      423     1800    76.5%    23.5%
+Map/Set-based logic                   823      713     1536    53.6%    46.4%
+Conditional/branch-heavy logic        769      491     1260    61.0%    39.0%
+Sorting                               479      381      860    55.7%    44.3%
+Arithmetic/numeric computation        386      218      604    63.9%    36.1%
+
+=== LENGTH BUCKET x ROUTE (full population) ===
+Length                     Direct     Algo    Total  %Direct    %Algo
+long (>35 lines)             4050     3586     7636    53.0%    47.0%
+medium (15-35 lines)         9198     6050    15248    60.3%    39.7%
+short (<=14 lines)           5747     2569     8316    69.1%    30.9%
+
+=== WITHIN DIRECT-ROUTED: type composition ===
+Array/List processing                8274  ( 43.6% of all direct-routed)
+Other/mixed logic                    2683  ( 14.1% of all direct-routed)
+Nested/loop-heavy iteration          2467  ( 13.0% of all direct-routed)
+String processing                    1737  (  9.1% of all direct-routed)
+Short, low-control-flow logic        1377  (  7.2% of all direct-routed)
+Map/Set-based logic                   823  (  4.3% of all direct-routed)
+Conditional/branch-heavy logic        769  (  4.0% of all direct-routed)
+Sorting                               479  (  2.5% of all direct-routed)
+Arithmetic/numeric computation        386  (  2.0% of all direct-routed)
+
+=== WITHIN ALGO-ROUTED: type composition ===
+Array/List processing                5790  ( 47.4% of all algo-routed)
+Other/mixed logic                    1513  ( 12.4% of all algo-routed)
+Nested/loop-heavy iteration          1469  ( 12.0% of all algo-routed)
+String processing                    1207  (  9.9% of all algo-routed)
+Map/Set-based logic                   713  (  5.8% of all algo-routed)
+Conditional/branch-heavy logic        491  (  4.0% of all algo-routed)
+Short, low-control-flow logic         423  (  3.5% of all algo-routed)
+Sorting                               381  (  3.1% of all algo-routed)
+Arithmetic/numeric computation        218  (  1.8% of all algo-routed)
+
+Saved 31200 classified evaluations to /tmp/type_analysis/all_evaluations.json

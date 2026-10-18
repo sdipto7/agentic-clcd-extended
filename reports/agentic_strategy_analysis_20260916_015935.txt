@@ -1,0 +1,58 @@
+AGENTIC STRATEGY SELECTION ANALYSIS
+============================================================
+Generated:  2026-09-16 01:59:35
+Datasets:   xlcost, codenet, gptclonebench
+Languages:  all languages present
+Models:     deepseek-v3.2, llama-3.3-nemotron, claude-3-haiku, gpt-4o-mini
+
+Methodology: a pair_id is classified as 'algorithm-based' if it appears
+in the matching output/agentic/algorithms_<model>_<dataset>.json file
+(written only when the agent called record_algorithms), and 'direct'
+otherwise. This reflects an observed side effect of route selection,
+not an explicit logged field.
+
+1. OVERALL (pooled across all models and selected datasets)
+============================================================
+
+Selected Strategy           Usage          
+--------------------------  ---------------
+Direct comparison           18995 (60.88%) 
+Algorithm-based comparison  12205 (39.12%) 
+Total                       31200 (100.00%)
+
+2. PER-MODEL, PER-DATASET BREAKDOWN
+====================================
+
+Model               Dataset        Total  Direct         Algorithm-based
+------------------  -------------  -----  -------------  ---------------
+deepseek-v3.2       xlcost         3600   2681 (74.47%)  919 (25.53%)   
+llama-3.3-nemotron  xlcost         3600   2249 (62.47%)  1351 (37.53%)  
+claude-3-haiku      xlcost         3600   2885 (80.14%)  715 (19.86%)   
+gpt-4o-mini         xlcost         3600   1261 (35.03%)  2339 (64.97%)  
+deepseek-v3.2       codenet        1800   939 (52.17%)   861 (47.83%)   
+llama-3.3-nemotron  codenet        1800   1159 (64.39%)  641 (35.61%)   
+claude-3-haiku      codenet        1800   1397 (77.61%)  403 (22.39%)   
+gpt-4o-mini         codenet        1800   439 (24.39%)   1361 (75.61%)  
+deepseek-v3.2       gptclonebench  2400   2066 (86.08%)  334 (13.92%)   
+llama-3.3-nemotron  gptclonebench  2400   897 (37.38%)   1503 (62.62%)  
+claude-3-haiku      gptclonebench  2400   2093 (87.21%)  307 (12.79%)   
+gpt-4o-mini         gptclonebench  2400   929 (38.71%)   1471 (61.29%)  
+
+3. LATEX-READY VALUES
+======================
+
+-- Copy-ready table rows --
+Direct comparison & 18995 (60.88%) \\
+Algorithm-based comparison & 12205 (39.12%) \\
+Total & 31200 (100.00\%) \\
+
+4. NOTES
+========
+
+- Rerun this script any time after new experiment results land; it
+  always reflects the current contents of output/agentic/ for the
+  selected datasets and languages.
+- Pass --languages Python to restrict to Java-Python pairs only.
+- A pair recorded as ERROR (no confirmed verdict) is still classified
+  by whichever route left a trace: if record_algorithms was called
+  before the failure, it counts as algorithm-based; otherwise direct.

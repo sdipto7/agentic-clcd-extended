@@ -87,7 +87,7 @@ def _normalize_verdict_str(value: Any) -> Optional[str]:
     return None
 
 
-def _extract_verdict_from_text(raw_text: str) -> Optional[str]:
+def extract_verdict_from_text(raw_text: str) -> Optional[str]:
     """
     Heuristically find CLONE / NOT_CLONE in free-form text.
 
@@ -142,14 +142,14 @@ def interpret_llm_response(raw_text: str) -> Tuple[str, float, str]:
                 "Parsed JSON but verdict missing or invalid; using fallback. Raw: %s",
                 raw_text[:500],
             )
-            verdict = _extract_verdict_from_text(raw_text) or ERROR
+            verdict = extract_verdict_from_text(raw_text) or ERROR
             confidence = 0.5
 
         return verdict, confidence, reasoning
 
     logger.warning("JSON parse failed; using text fallback. Raw: %s", raw_text[:500])
     
-    verdict = _extract_verdict_from_text(raw_text)
+    verdict = extract_verdict_from_text(raw_text)
     if verdict is None:
         return ERROR, 0.5, ""
     

@@ -1,0 +1,67 @@
+DIRECT VS ALGORITHM-BASED PAIR-LEVEL COMPLEMENTARITY
+============================================================
+Generated:  2026-09-10 22:16:18
+Datasets:   xlcost, codenet, gptclonebench
+Languages:  all languages present
+Models:     deepseek-v3.2, llama-3.3-nemotron, claude-3-haiku, gpt-4o-mini
+
+Methodology: for each (model, dataset) stratum, every pair_id present in
+both output/direct/ and output/algo_based/ results is classified into one
+of four mutually-exclusive outcomes by comparing each pipeline's
+predicted_label against the dataset's ground_truth label (an ERROR or
+unrecognized predicted_label is always treated as incorrect). The four
+outcomes are pooled across every model by summing counts (the same
+sum-then-report approach used for pooled F1 elsewhere in this project).
+
+1. OVERALL COMPLEMENTARITY (pooled across all models)
+======================================================
+
+Prediction Outcome               xlcost  codenet  gptclonebench  Total
+-------------------------------  ------  -------  -------------  -----
+Both pipelines correct           11631   5215     7096           23942
+Direct correct, algorithm wrong  764     639      574            1977 
+Algorithm correct, direct wrong  1584    1024     1326           3934 
+Both pipelines wrong             421     322      604            1347 
+Total                            14400   7200     9600           31200
+
+2. FOCUS: DIRECT-CORRECT / ALGORITHM-WRONG, BY DATASET AND LANGUAGE
+====================================================================
+
+This is the case where the extra algorithm-extraction step actively hurt
+rather than helped - direct comparison already had the right answer, and
+converting to an algorithm representation changed it to the wrong one.
+'% of pairs' is relative to all pairs in that (dataset, language) stratum;
+'% of direct-correct' is relative only to pairs direct got right (i.e. of
+the pairs direct answered correctly, what fraction did algo then get wrong).
+
+Dataset        Language  Total Pairs  Direct-right/Algo-wrong  % of pairs  % of direct-correct
+-------------  --------  -----------  -----------------------  ----------  -------------------
+codenet        C#        2400         149                      6.21%       8.04%              
+codenet        C++       2400         395                      16.46%      17.46%             
+codenet        Python    2400         95                       3.96%       5.47%              
+gptclonebench  C#        4800         357                      7.44%       8.72%              
+gptclonebench  Python    4800         217                      4.52%       6.07%              
+xlcost         C#        4800         291                      6.06%       6.25%              
+xlcost         C++       4800         295                      6.15%       6.46%              
+xlcost         Python    4800         178                      3.71%       5.61%              
+
+3. LATEX-READY VALUES
+======================
+
+-- Copy-ready table rows (overall complementarity) --
+Both pipelines correct & 11,631 & 5,215 & 7,096 & 23,942 \\
+Direct correct, algorithm wrong & 764 & 639 & 574 & 1,977 \\
+Algorithm correct, direct wrong & 1,584 & 1,024 & 1,326 & 3,934 \\
+Both pipelines wrong & 421 & 322 & 604 & 1,347 \\
+\textbf{Total} & \textbf{14,400} & \textbf{7,200} & \textbf{9,600} & \textbf{31,200} \\
+
+4. NOTES
+========
+
+- Rerun this script any time after new experiment results land; it
+  always reflects the current contents of output/direct/ and
+  output/algo_based/ for the selected datasets and languages.
+- Pass --languages Python to reproduce the original Java-Python-only,
+  two-dataset figures.
+- A per-pair detail CSV listing every direct-correct/algo-wrong pair_id
+  is written alongside this report for qualitative inspection.

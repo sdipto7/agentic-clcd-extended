@@ -7,6 +7,8 @@ from __future__ import annotations
 from typing import List
 
 from langchain_classic.agents import AgentExecutor, create_react_agent
+from langchain_classic.agents.output_parsers import ReActSingleInputOutputParser
+from langchain_core.agents import AgentAction, AgentFinish
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import BaseTool
@@ -14,6 +16,29 @@ from langchain_core.tools import BaseTool
 from src.core.constants import AGENT_MAX_ITERATIONS
 from src.inference.agentic.skills import SKILL_REGISTRY
 from src.inference.agentic.tools import get_agent_tools
+
+# Must match the stop sequence create_react_agent binds to the LLM below.
+REACT_STOP_SEQUENCE = "\nObservation"
+
+
+class TruncatingReActOutputParser(ReActSingleInputOutputParser):
+    """
+    ReAct output parser that truncates at the stop sequence before parsing.
+
+    Some providers (observed with deepseek-v3.2 via OpenRouter) do not honor
+    the "stop" sequence bound to the LLM, so the model keeps generating past
+    the point where it should hand control back to the executor - hallucinating
+    further Thought/Action/Observation turns (with fabricated tool outputs) in
+    a single completion. Truncating client-side recovers the intended
+    single-step ReAct behavior regardless of whether the provider enforced
+    the stop sequence itself.
+    """
+
+    def parse(self, text: str) -> AgentAction | AgentFinish:
+        idx = text.find(REACT_STOP_SEQUENCE)
+        if idx != -1:
+            text = text[:idx]
+        return super().parse(text)
 
 
 def build_agent_system_prompt() -> str:
@@ -109,7 +134,9 @@ def build_react_executor(llm: BaseLanguageModel) -> AgentExecutor:
     ).partial(system_prompt=build_agent_system_prompt())
 
     tools: List[BaseTool] = get_agent_tools()
-    agent = create_react_agent(llm, tools, prompt)
+    agent = create_react_agent(
+        llm, tools, prompt, output_parser=TruncatingReActOutputParser()
+    )
 
     return AgentExecutor(
         agent=agent,

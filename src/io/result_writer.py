@@ -26,6 +26,8 @@ class ResultWriter:
         self._file_exists = os.path.isfile(csv_path)
         self._fieldnames = [
             "pair_id",
+            "ll1",
+            "ll2",
             "ground_truth",
             "predicted_label",
         ]
@@ -34,6 +36,8 @@ class ResultWriter:
     def record_result(
         self,
         pair_id: str,
+        ll1: str,
+        ll2: str,
         ground_truth: int,
         predicted_label: str,
     ) -> None:
@@ -42,11 +46,15 @@ class ResultWriter:
 
         Args:
             pair_id: Stable identifier for the pair.
+            ll1: Language of codeA for this pair (always "Java" in this project).
+            ll2: Language of codeB for this pair (e.g. "Python", "C++", "C#").
             ground_truth: 1 clone, 0 non-clone.
             predicted_label: CLONE, NOT_CLONE, or ERROR.
         """
         row = {
             "pair_id": pair_id,
+            "ll1": ll1,
+            "ll2": ll2,
             "ground_truth": ground_truth,
             "predicted_label": predicted_label,
         }

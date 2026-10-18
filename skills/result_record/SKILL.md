@@ -10,7 +10,7 @@ Use this skill after you have completed your analysis and formed a final verdict
 1. `pair_id` for the active pair (provided in the task text),
 2. Your final verdict: exactly `CLONE` or `NOT_CLONE`.
 3. A confidence score between 0.0 and 1.0 representing how certain you are of your verdict based on the evidence.
-4. A reasoning string of max 100 words citing the specific behavioral evidence that determined your verdict.
+4. A reasoning string of max 50 words citing the specific behavioral evidence that determined your verdict.
 
 ## Calling write_result tool
 Pass a single JSON string as the data argument:

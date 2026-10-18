@@ -1,0 +1,96 @@
+POOLED CLONE-DETECTION PERFORMANCE ANALYSIS
+============================================================
+Generated:  2026-09-10 22:14:23
+Datasets:   xlcost, codenet, gptclonebench
+Languages:  all languages present
+Pipelines:  direct, algo_based, agentic
+Models:     claude-3-haiku, deepseek-v3.2, gpt-4o-mini, llama-3.3-nemotron
+
+Methodology: pooled metrics are computed by first summing raw
+TP/TN/FP/FN confusion counts across every run in the group, then
+deriving precision/recall/F1 once from those combined counts - not by
+averaging per-run metrics. This matches the pooling formulas in
+chap4_agentic_clcd.tex (TP_pooled = sum(TP_i), etc.). A prediction that
+is not CLONE or NOT_CLONE (e.g. ERROR) always counts as incorrect: a
+false negative if the pair is a true clone, a false positive otherwise.
+
+1. OVERALL POOLED PERFORMANCE (pooled across all models and datasets)
+========================================================================
+
+Pipeline    Total  Precision  Recall  F1     TP     TN     FP    FN  
+----------  -----  ---------  ------  -----  -----  -----  ----  ----
+direct      31200  85.5%      79.7%   82.5%  12428  13491  2109  3172
+algo_based  31200  91.2%      87.1%   89.1%  13588  14288  1312  2012
+agentic     31200  96.0%      93.3%   94.6%  14548  14994  606   1052
+
+2. MODEL-LEVEL POOLED F1-SCORE (pooled across selected datasets, per model)
+============================================================================
+
+Model               direct  algo_based  agentic
+------------------  ------  ----------  -------
+claude-3-haiku      91.0%   94.4%       98.3%  
+deepseek-v3.2       83.8%   90.4%       94.4%  
+gpt-4o-mini         79.0%   87.6%       94.3%  
+llama-3.3-nemotron  76.0%   83.9%       91.2%  
+
+3. LATEX-READY VALUES (rounded to nearest whole percent, matches tikz charts)
+==============================================================================
+
+-- Panel (a): Overall pooled performance --
+% --- Precision
+\addplot+[...] coordinates {
+    (direct,85)
+    (algo_based,91)
+    (agentic,96)
+};
+
+% --- Recall
+\addplot+[...] coordinates {
+    (direct,80)
+    (algo_based,87)
+    (agentic,93)
+};
+
+% --- F1
+\addplot+[...] coordinates {
+    (direct,82)
+    (algo_based,89)
+    (agentic,95)
+};
+
+-- Panel (b): Model-level pooled F1-score --
+% --- direct
+\addplot+[...] coordinates {
+    (claude-3-haiku,91)
+    (deepseek-v3.2,84)
+    (gpt-4o-mini,79)
+    (llama-3.3-nemotron,76)
+};
+
+% --- algo_based
+\addplot+[...] coordinates {
+    (claude-3-haiku,94)
+    (deepseek-v3.2,90)
+    (gpt-4o-mini,88)
+    (llama-3.3-nemotron,84)
+};
+
+% --- agentic
+\addplot+[...] coordinates {
+    (claude-3-haiku,98)
+    (deepseek-v3.2,94)
+    (gpt-4o-mini,94)
+    (llama-3.3-nemotron,91)
+};
+
+4. NOTES
+========
+
+- Rerun this script any time after new experiment results land; it always
+  reflects the current contents of output/ for the selected datasets and
+  languages, so the numbers above will shift as more runs complete.
+- Pass --languages Python to restrict to Java-Python pairs only (useful for
+  comparing against earlier, pre-multi-language figures).
+- Pass --datasets to widen or narrow which datasets are pooled together;
+  the default (xlcost, codenet) matches the two datasets every model was
+  originally evaluated on across all three pipelines.

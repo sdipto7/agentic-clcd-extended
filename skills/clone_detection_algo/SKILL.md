@@ -7,7 +7,7 @@ description: Instructions for how to detect cross-language clones by comparing t
 Apply this skill after both code fragments have been converted to language-agnostic algorithms by following the instructions of algorithm_extraction skill.
 
 ## Background
-You are comparing two algorithms - Algorithm A extracted from Java and Algorithm B extracted from Python. Your task is to determine whether both algorithms implement the same computational logic, meaning they are cross-language code clones. This comparison is purely at the logical level - language, syntax, and naming differences are already eliminated in the algorithm.
+You are comparing two algorithms - Algorithm A extracted from Java and Algorithm B extracted from the second fragment of another programming language. Your task is to determine whether both algorithms implement the same computational logic, meaning they are cross-language code clones. This comparison is purely at the logical level - language, syntax, and naming differences are already eliminated in the algorithm.
 
 ## Reasoning Approach - follow this order
 1. Read Algorithm A and Algorithm B independently: identify the entry point, the role of each function, data flow, and how each algorithm handles edge cases and errors.

@@ -1,0 +1,56 @@
+
+NiCad Cross-Clone Detector v7.0 (4.4.24)
+
+config=./lib/nicad/config/default-report.cfg
+system1=/home/sxa510/research/code/agentic-clcd/baselines/nicad_source/prepared/gptclonebench/gptclonebench_direct_java
+system2=/home/sxa510/research/code/agentic-clcd/baselines/nicad_source/prepared/gptclonebench/gptclonebench_direct_python
+threshold=0.30
+granularity=functions
+language=java
+transform=none
+rename=blind
+filter=none
+abstract=none
+normalize=none
+cluster=yes
+report=yes
+include=
+exclude=
+
+Tue Sep  8 10:29:50 PM CST 2026
+
+Extracting functions from java files in nicadclones/gptclonebench_direct_java/gptclonebench_direct_java
+
+real	0m18.595s
+user	0m8.127s
+sys	0m11.175s
+
+*** Warning: 126 source files failed to parse
+
+Extracted 1074 functions
+
+Tue Sep  8 10:30:09 PM CST 2026
+
+Extracting functions from java files in nicadclones/gptclonebench_direct_java/gptclonebench_direct_python
+
+real	0m0.005s
+user	0m0.005s
+sys	0m0.004s
+
+Extracted 0 functions
+
+Applying blind renaming to extracted functions from java files in nicadclones/gptclonebench_direct_java/gptclonebench_direct_java
+
+real	0m0.304s
+user	0m0.245s
+sys	0m0.058s
+
+Applying blind renaming to extracted functions from java files in nicadclones/gptclonebench_direct_java/gptclonebench_direct_python
+
+real	0m0.002s
+user	0m0.000s
+sys	0m0.002s
+
+*** ERROR: Renaming failed, code 99
+Detailed log in nicadclones/gptclonebench_direct_java/gptclonebench_direct_python_functions-crossclones-2026-09-08-22:30:09.log
+

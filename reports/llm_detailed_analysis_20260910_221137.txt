@@ -1,0 +1,233 @@
+LLM PIPELINE - DETAILED ANALYSIS REPORT
+============================================================
+Generated:       2026-09-10 22:11:37
+Files analyzed:  36
+Total pairs:     93600
+Pipelines:       agentic, algo_based, direct
+Models:          claude-3-haiku, deepseek-v3.2, gpt-4o-mini, llama-3.3-nemotron
+Datasets:        codenet, gptclonebench, xlcost
+Languages (ll2): C#, C++, Python
+
+Methodology: every metric below is computed by pooling raw
+true_positive/true_negative/false_positive/false_negative counts across
+all rows in the group, then deriving accuracy/precision/recall/F1 from
+those pooled counts - not by averaging per-file metrics. A prediction of
+ERROR (the model failed to produce a usable verdict) counts as incorrect:
+a false negative if the pair is a true clone, a false positive otherwise.
+Some datasets do not include every language (e.g., clcdsa is Python-only;
+gptclonebench has Python and C# but no C++), so language totals reflect
+only the datasets that actually contain that language. If any experiment
+is still in progress, totals reflect whatever has completed so far.
+
+1. PIPELINE-LEVEL SUMMARY (pooled across all models, datasets, languages)
+=========================================================================
+
+Pipeline    Total  Accuracy  Precision  Recall  F1    TP     TN     FP    FN  
+----------  -----  --------  ---------  ------  ----  -----  -----  ----  ----
+agentic     31200  0.95      0.96       0.93    0.95  14548  14994  606   1052
+algo_based  31200  0.89      0.91       0.87    0.89  13588  14288  1312  2012
+direct      31200  0.83      0.85       0.80    0.82  12428  13491  2109  3172
+
+Highest F1: agentic (F1=0.95, accuracy=0.95) | Lowest F1: direct (F1=0.82, accuracy=0.83)
+
+2. MODEL-LEVEL SUMMARY (pooled across all pipelines, datasets, languages)
+=========================================================================
+
+Model               Total  Accuracy  Precision  Recall  F1    TP     TN     FP    FN  
+------------------  -----  --------  ---------  ------  ----  -----  -----  ----  ----
+claude-3-haiku      23400  0.95      0.96       0.94    0.95  10956  11194  506   744 
+deepseek-v3.2       23400  0.90      0.92       0.88    0.90  10250  10764  936   1450
+gpt-4o-mini         23400  0.88      0.90       0.84    0.87  9868   10607  1093  1832
+llama-3.3-nemotron  23400  0.84      0.86       0.81    0.84  9490   10208  1492  2210
+
+Highest F1: claude-3-haiku (F1=0.95, accuracy=0.95) | Lowest F1: llama-3.3-nemotron (F1=0.84, accuracy=0.84)
+
+3. DATASET-LEVEL SUMMARY (pooled across all pipelines, models, languages)
+=========================================================================
+
+Dataset        Total  Accuracy  Precision  Recall  F1    TP     TN     FP    FN  
+-------------  -----  --------  ---------  ------  ----  -----  -----  ----  ----
+xlcost         43200  0.91      0.92       0.90    0.91  19459  19933  1667  2141
+gptclonebench  28800  0.88      0.90       0.85    0.87  12188  13118  1282  2212
+codenet        21600  0.86      0.89       0.83    0.86  8917   9722   1078  1883
+
+Highest F1: xlcost (F1=0.91, accuracy=0.91) | Lowest F1: codenet (F1=0.86, accuracy=0.86)
+
+4. LANGUAGE-LEVEL SUMMARY (pooled across all pipelines, models, datasets)
+=========================================================================
+
+Language  Total  Accuracy  Precision  Recall  F1    TP     TN     FP    FN  
+--------  -----  --------  ---------  ------  ----  -----  -----  ----  ----
+C++       21600  0.93      0.95       0.91    0.93  9850   10250  550   950 
+C#        36000  0.92      0.95       0.88    0.91  15816  17198  802   2184
+Python    36000  0.84      0.85       0.83    0.84  14898  15325  2675  3102
+
+Highest F1: C++ (F1=0.93, accuracy=0.93) | Lowest F1: Python (F1=0.84, accuracy=0.84)
+
+5. PIPELINE x LANGUAGE BREAKDOWN (pooled across models and datasets)
+====================================================================
+
+Pipeline: agentic
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN 
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ---
+C#        12000  0.96      0.97       0.95    0.96  5717  5793  207  283
+C++       7200   0.95      0.96       0.93    0.94  3355  3453  147  245
+Python    12000  0.94      0.96       0.91    0.93  5476  5748  252  524
+
+Pipeline: algo_based
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN 
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ---
+C#        12000  0.91      0.93       0.89    0.91  5321  5581  419  679
+C++       7200   0.90      0.93       0.86    0.89  3082  3380  220  518
+Python    12000  0.88      0.89       0.86    0.87  5185  5327  673  815
+
+Pipeline: direct
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP    FN  
+--------  -----  --------  ---------  ------  ----  ----  ----  ----  ----
+C++       7200   0.95      0.95       0.95    0.95  3413  3417  183   187 
+C#        12000  0.88      0.96       0.80    0.87  4778  5824  176   1222
+Python    12000  0.71      0.71       0.71    0.71  4237  4250  1750  1763
+
+6. MODEL x LANGUAGE BREAKDOWN (pooled across pipelines and datasets)
+====================================================================
+
+Model: claude-3-haiku
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN 
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ---
+C++       5400   0.97      0.98       0.97    0.97  2609  2640  60   91 
+C#        9000   0.95      0.98       0.92    0.95  4137  4422  78   363
+Python    9000   0.93      0.92       0.94    0.93  4210  4132  368  290
+
+Model: deepseek-v3.2
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN 
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ---
+C++       5400   0.95      0.97       0.92    0.94  2484  2625  75   216
+C#        9000   0.92      0.96       0.88    0.92  3964  4331  169  536
+Python    9000   0.85      0.85       0.84    0.85  3802  3808  692  698
+
+Model: gpt-4o-mini
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN 
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ---
+C++       5400   0.93      0.96       0.89    0.93  2410  2602  98   290
+C#        9000   0.89      0.96       0.82    0.88  3677  4337  163  823
+Python    9000   0.83      0.82       0.84    0.83  3781  3668  832  719
+
+Model: llama-3.3-nemotron
+Language  Total  Accuracy  Precision  Recall  F1    TP    TN    FP   FN  
+--------  -----  --------  ---------  ------  ----  ----  ----  ---  ----
+C#        9000   0.91      0.91       0.90    0.90  4038  4108  392  462 
+C++       5400   0.88      0.88       0.87    0.88  2347  2383  317  353 
+Python    9000   0.76      0.80       0.69    0.74  3105  3717  783  1395
+
+7. FULL DETAIL (pipeline x model x dataset x language, no pooling beyond this row)
+============================================================================
+
+Pipeline    Model               Dataset        Language  Total  Accuracy  Precision  Recall  F1    TP   TN   FP   FN 
+----------  ------------------  -------------  --------  -----  --------  ---------  ------  ----  ---  ---  ---  ---
+agentic     claude-3-haiku      codenet        C#        600    0.97      0.98       0.97    0.97  291  293  7    9  
+agentic     claude-3-haiku      codenet        C++       600    0.96      0.96       0.97    0.96  291  287  13   9  
+agentic     claude-3-haiku      codenet        Python    600    0.96      0.97       0.96    0.96  288  291  9    12 
+agentic     claude-3-haiku      gptclonebench  C#        1200   0.99      0.99       0.98    0.99  591  597  3    9  
+agentic     claude-3-haiku      gptclonebench  Python    1200   0.99      0.99       0.99    0.99  594  593  7    6  
+agentic     claude-3-haiku      xlcost         C#        1200   0.99      0.97       1.00    0.99  599  584  16   1  
+agentic     claude-3-haiku      xlcost         C++       1200   0.98      0.97       1.00    0.99  599  583  17   1  
+agentic     claude-3-haiku      xlcost         Python    1200   0.99      1.00       0.98    0.99  589  600  0    11 
+agentic     deepseek-v3.2       codenet        C#        600    0.95      0.96       0.94    0.95  283  288  12   17 
+agentic     deepseek-v3.2       codenet        C++       600    0.93      0.95       0.91    0.93  273  287  13   27 
+agentic     deepseek-v3.2       codenet        Python    600    0.88      0.92       0.82    0.87  246  280  20   54 
+agentic     deepseek-v3.2       gptclonebench  C#        1200   0.95      0.92       0.98    0.95  591  551  49   9  
+agentic     deepseek-v3.2       gptclonebench  Python    1200   0.92      0.99       0.85    0.92  512  594  6    88 
+agentic     deepseek-v3.2       xlcost         C#        1200   0.97      0.97       0.97    0.97  581  583  17   19 
+agentic     deepseek-v3.2       xlcost         C++       1200   0.96      0.97       0.95    0.96  570  583  17   30 
+agentic     deepseek-v3.2       xlcost         Python    1200   0.96      0.96       0.95    0.96  573  577  23   27 
+agentic     gpt-4o-mini         codenet        C#        600    0.94      0.96       0.92    0.94  275  288  12   25 
+agentic     gpt-4o-mini         codenet        C++       600    0.94      0.96       0.92    0.94  277  287  13   23 
+agentic     gpt-4o-mini         codenet        Python    600    0.81      0.88       0.73    0.80  220  269  31   80 
+agentic     gpt-4o-mini         gptclonebench  C#        1200   0.96      0.98       0.94    0.96  566  590  10   34 
+agentic     gpt-4o-mini         gptclonebench  Python    1200   0.96      0.98       0.95    0.96  570  587  13   30 
+agentic     gpt-4o-mini         xlcost         C#        1200   0.97      0.99       0.96    0.97  578  592  8    22 
+agentic     gpt-4o-mini         xlcost         C++       1200   0.97      0.98       0.96    0.97  574  591  9    26 
+agentic     gpt-4o-mini         xlcost         Python    1200   0.92      0.90       0.94    0.92  561  540  60   39 
+agentic     llama-3.3-nemotron  codenet        C#        600    0.90      0.91       0.88    0.90  265  275  25   35 
+agentic     llama-3.3-nemotron  codenet        C++       600    0.88      0.89       0.87    0.88  260  267  33   40 
+agentic     llama-3.3-nemotron  codenet        Python    600    0.78      0.87       0.65    0.74  195  270  30   105
+agentic     llama-3.3-nemotron  gptclonebench  C#        1200   0.95      0.97       0.93    0.95  555  581  19   45 
+agentic     llama-3.3-nemotron  gptclonebench  Python    1200   0.95      0.96       0.94    0.95  564  578  22   36 
+agentic     llama-3.3-nemotron  xlcost         C#        1200   0.93      0.95       0.90    0.93  542  571  29   58 
+agentic     llama-3.3-nemotron  xlcost         C++       1200   0.90      0.94       0.85    0.89  511  568  32   89 
+agentic     llama-3.3-nemotron  xlcost         Python    1200   0.94      0.95       0.94    0.94  564  569  31   36 
+algo_based  claude-3-haiku      codenet        C#        600    0.92      0.95       0.88    0.92  264  287  13   36 
+algo_based  claude-3-haiku      codenet        C++       600    0.89      0.95       0.82    0.88  245  287  13   55 
+algo_based  claude-3-haiku      codenet        Python    600    0.95      0.93       0.98    0.95  293  277  23   7  
+algo_based  claude-3-haiku      gptclonebench  C#        1200   0.94      0.97       0.92    0.94  553  580  20   47 
+algo_based  claude-3-haiku      gptclonebench  Python    1200   0.93      0.95       0.90    0.93  542  573  27   58 
+algo_based  claude-3-haiku      xlcost         C#        1200   0.97      0.97       0.97    0.97  582  584  16   18 
+algo_based  claude-3-haiku      xlcost         C++       1200   0.97      0.97       0.97    0.97  584  583  17   16 
+algo_based  claude-3-haiku      xlcost         Python    1200   0.95      0.94       0.95    0.95  571  564  36   29 
+algo_based  deepseek-v3.2       codenet        C#        600    0.91      0.94       0.86    0.90  259  284  16   41 
+algo_based  deepseek-v3.2       codenet        C++       600    0.85      0.93       0.75    0.83  226  284  16   74 
+algo_based  deepseek-v3.2       codenet        Python    600    0.92      0.89       0.97    0.93  290  263  37   10 
+algo_based  deepseek-v3.2       gptclonebench  C#        1200   0.92      0.92       0.92    0.92  549  554  46   51 
+algo_based  deepseek-v3.2       gptclonebench  Python    1200   0.85      0.89       0.79    0.84  475  544  56   125
+algo_based  deepseek-v3.2       xlcost         C#        1200   0.95      0.95       0.94    0.95  566  572  28   34 
+algo_based  deepseek-v3.2       xlcost         C++       1200   0.94      0.95       0.93    0.94  555  571  29   45 
+algo_based  deepseek-v3.2       xlcost         Python    1200   0.89      0.89       0.90    0.89  538  535  65   62 
+algo_based  gpt-4o-mini         codenet        C#        600    0.82      0.87       0.74    0.80  223  268  32   77 
+algo_based  gpt-4o-mini         codenet        C++       600    0.79      0.87       0.69    0.77  206  268  32   94 
+algo_based  gpt-4o-mini         codenet        Python    600    0.92      0.88       0.97    0.92  290  262  38   10 
+algo_based  gpt-4o-mini         gptclonebench  C#        1200   0.89      0.90       0.88    0.89  525  543  57   75 
+algo_based  gpt-4o-mini         gptclonebench  Python    1200   0.83      0.87       0.78    0.82  468  532  68   132
+algo_based  gpt-4o-mini         xlcost         C#        1200   0.92      0.93       0.92    0.92  550  556  44   50 
+algo_based  gpt-4o-mini         xlcost         C++       1200   0.92      0.93       0.92    0.92  549  556  44   51 
+algo_based  gpt-4o-mini         xlcost         Python    1200   0.88      0.88       0.89    0.88  534  525  75   66 
+algo_based  llama-3.3-nemotron  codenet        C#        600    0.85      0.92       0.77    0.84  231  281  19   69 
+algo_based  llama-3.3-nemotron  codenet        C++       600    0.79      0.89       0.66    0.76  197  276  24   103
+algo_based  llama-3.3-nemotron  codenet        Python    600    0.80      0.76       0.86    0.81  257  221  79   43 
+algo_based  llama-3.3-nemotron  gptclonebench  C#        1200   0.85      0.86       0.83    0.84  496  519  81   104
+algo_based  llama-3.3-nemotron  gptclonebench  Python    1200   0.81      0.84       0.76    0.80  458  511  89   142
+algo_based  llama-3.3-nemotron  xlcost         C#        1200   0.90      0.92       0.87    0.89  523  553  47   77 
+algo_based  llama-3.3-nemotron  xlcost         C++       1200   0.90      0.92       0.87    0.89  520  555  45   80 
+algo_based  llama-3.3-nemotron  xlcost         Python    1200   0.82      0.85       0.78    0.82  469  520  80   131
+direct      claude-3-haiku      codenet        C#        600    0.83      1.00       0.66    0.79  197  300  0    103
+direct      claude-3-haiku      codenet        C++       600    1.00      1.00       1.00    1.00  300  300  0    0  
+direct      claude-3-haiku      codenet        Python    600    0.85      0.79       0.96    0.86  287  222  78   13 
+direct      claude-3-haiku      gptclonebench  C#        1200   0.89      0.99       0.78    0.87  467  597  3    133
+direct      claude-3-haiku      gptclonebench  Python    1200   0.90      0.88       0.93    0.90  555  522  78   45 
+direct      claude-3-haiku      xlcost         C#        1200   0.99      1.00       0.99    0.99  593  600  0    7  
+direct      claude-3-haiku      xlcost         C++       1200   0.99      1.00       0.98    0.99  590  600  0    10 
+direct      claude-3-haiku      xlcost         Python    1200   0.82      0.82       0.82    0.82  491  490  110  109
+direct      deepseek-v3.2       codenet        C#        600    0.72      1.00       0.45    0.62  134  300  0    166
+direct      deepseek-v3.2       codenet        C++       600    1.00      1.00       1.00    1.00  300  300  0    0  
+direct      deepseek-v3.2       codenet        Python    600    0.71      0.66       0.89    0.76  267  160  140  33 
+direct      deepseek-v3.2       gptclonebench  C#        1200   0.85      1.00       0.70    0.82  418  599  1    182
+direct      deepseek-v3.2       gptclonebench  Python    1200   0.78      0.76       0.83    0.79  498  442  158  102
+direct      deepseek-v3.2       xlcost         C#        1200   0.99      1.00       0.97    0.99  583  600  0    17 
+direct      deepseek-v3.2       xlcost         C++       1200   0.97      1.00       0.93    0.97  560  600  0    40 
+direct      deepseek-v3.2       xlcost         Python    1200   0.68      0.68       0.67    0.68  403  413  187  197
+direct      gpt-4o-mini         codenet        C#        600    0.67      1.00       0.34    0.51  102  300  0    198
+direct      gpt-4o-mini         codenet        C++       600    1.00      1.00       1.00    1.00  300  300  0    0  
+direct      gpt-4o-mini         codenet        Python    600    0.72      0.68       0.85    0.75  255  179  121  45 
+direct      gpt-4o-mini         gptclonebench  C#        1200   0.78      1.00       0.55    0.71  330  600  0    270
+direct      gpt-4o-mini         gptclonebench  Python    1200   0.76      0.73       0.82    0.77  490  422  178  110
+direct      gpt-4o-mini         xlcost         C#        1200   0.94      1.00       0.88    0.94  528  600  0    72 
+direct      gpt-4o-mini         xlcost         C++       1200   0.92      1.00       0.84    0.91  504  600  0    96 
+direct      gpt-4o-mini         xlcost         Python    1200   0.62      0.61       0.66    0.63  393  352  248  207
+direct      llama-3.3-nemotron  codenet        C#        600    0.87      0.86       0.88    0.87  263  258  42   37 
+direct      llama-3.3-nemotron  codenet        C++       600    0.77      0.72       0.89    0.79  267  195  105  33 
+direct      llama-3.3-nemotron  codenet        Python    600    0.61      0.76       0.33    0.46  100  268  32   200
+direct      llama-3.3-nemotron  gptclonebench  C#        1200   0.90      0.87       0.94    0.91  565  517  83   35 
+direct      llama-3.3-nemotron  gptclonebench  Python    1200   0.54      0.55       0.43    0.48  256  392  208  344
+direct      llama-3.3-nemotron  xlcost         C#        1200   0.96      0.93       1.00    0.96  598  553  47   2  
+direct      llama-3.3-nemotron  xlcost         C++       1200   0.93      0.88       0.99    0.93  592  522  78   8  
+direct      llama-3.3-nemotron  xlcost         Python    1200   0.53      0.53       0.40    0.46  242  388  212  358
+
+8. NOTES
+========
+
+- A group with 0 total pairs cannot occur here: every group above is
+  derived only from rows that actually exist in the scanned result files.
+- 'UNKNOWN' under Language would mean a result file predates the ll1/ll2
+  columns; none of the currently scanned files are expected to hit this.
+- This report is regenerated from scratch on every run of evaluate.py and
+  always reflects the current contents of the output/ directory at that
+  moment - rerun it any time after new experiment results land.

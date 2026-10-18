@@ -43,7 +43,9 @@ def run_direct_workflow(
         t0 = time.perf_counter()
         pair_id = record["pair_id"]
 
-        clone_detection_prompt = DIRECT_DETECTION_PROMPT.format(codeA=record["codeA"], codeB=record["codeB"])
+        clone_detection_prompt = DIRECT_DETECTION_PROMPT.format(
+            codeA=record["codeA"], codeB=record["codeB"], language_b=record["ll2"]
+        )
         llm_response_raw = invoke_with_single_retry(llm, clone_detection_prompt)
 
         elapsed = time.perf_counter() - t0
@@ -56,6 +58,8 @@ def run_direct_workflow(
 
         writer.record_result(
             pair_id=pair_id,
+            ll1=record["ll1"],
+            ll2=record["ll2"],
             ground_truth=record["label"],
             predicted_label=verdict,
         )

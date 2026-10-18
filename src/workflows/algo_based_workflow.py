@@ -12,7 +12,6 @@ from tqdm import tqdm
 from src.core.constants import (
     ERROR,
     JAVA_LANGUAGE_IDENTIFIER,
-    PYTHON_LANGUAGE_IDENTIFIER,
     LABEL_TO_VERDICT,
     NOT_CLONE,
     PIPELINE_ALGO_BASED,
@@ -46,24 +45,27 @@ def run_algo_based_workflow(
         t0 = time.perf_counter()
         pair_id = record["pair_id"]
 
+        language_b = record["ll2"]
         java_to_algo_extraction_prompt = ALGO_EXTRACTION_PROMPT.format(language=JAVA_LANGUAGE_IDENTIFIER, source_code=record["codeA"])
-        py_to_algo_extraction_prompt = ALGO_EXTRACTION_PROMPT.format(language=PYTHON_LANGUAGE_IDENTIFIER, source_code=record["codeB"])
+        other_to_algo_extraction_prompt = ALGO_EXTRACTION_PROMPT.format(language=language_b, source_code=record["codeB"])
 
         algo_java = invoke_with_single_retry(llm, java_to_algo_extraction_prompt).strip()
         pace_api_call()
-        
-        algo_py = invoke_with_single_retry(llm, py_to_algo_extraction_prompt).strip()
+
+        algo_b = invoke_with_single_retry(llm, other_to_algo_extraction_prompt).strip()
         pace_api_call()
 
         if not algo_java:
             algo_java = "(extraction failed — empty response)"
             logger.error("Java algorithm extraction empty for %s", pair_id)
 
-        if not algo_py:
-            algo_py = "(extraction failed — empty response)"
-            logger.error("Python algorithm extraction empty for %s", pair_id)
+        if not algo_b:
+            algo_b = "(extraction failed — empty response)"
+            logger.error("%s algorithm extraction empty for %s", language_b, pair_id)
 
-        clone_detection_prompt = ALGO_DETECTION_PROMPT.format(algorithm_a=algo_java, algorithm_b=algo_py)
+        clone_detection_prompt = ALGO_DETECTION_PROMPT.format(
+            algorithm_a=algo_java, algorithm_b=algo_b, language_b=language_b
+        )
 
         llm_response_raw = invoke_with_single_retry(llm, clone_detection_prompt)
 
@@ -77,6 +79,8 @@ def run_algo_based_workflow(
 
         writer.record_result(
             pair_id=pair_id,
+            ll1=record["ll1"],
+            ll2=record["ll2"],
             ground_truth=record["label"],
             predicted_label=verdict,
         )
@@ -89,7 +93,7 @@ def run_algo_based_workflow(
                 algorithms_by_pair={
                     pair_id: {
                         "java_algorithm": algo_java,
-                        "python_algorithm": algo_py,
+                        "ll2_algorithm": algo_b,
                     },
                 },
             )
